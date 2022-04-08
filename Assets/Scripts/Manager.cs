@@ -15,6 +15,8 @@ public class Manager : MonoBehaviour
     // Topic物体UI的预制体
     public GameObject topicConentPrefab;
     public MarkdownRenderer markdownRenderer;
+    // 标签dropdown
+    public TMP_Dropdown tagDropdown;
 
     #endregion
 
@@ -26,6 +28,8 @@ public class Manager : MonoBehaviour
     private string markdownRootPath;
     // topic的列表
     private List<Topic> topicList = new List<Topic>();
+    // 保存已有的标签
+    HashSet<string> tagSet = new HashSet<string>();
 
     private void Awake()
     {
@@ -35,12 +39,26 @@ public class Manager : MonoBehaviour
 
         // 读取Json
         ReadJson();
+
+        // 设置标签选项
+        List<string> tagList = new List<string>();
+        foreach (var tag in tagSet) tagList.Add(tag);
+        tagDropdown.AddOptions(tagList);
     }
 
     private void Start()
     {
         // 显示全部
         Filter();
+    }
+
+    public void OnDropDownChange()
+    {
+        string tag = tagDropdown.captionText.text;
+        if (tag == "全部")
+            Filter();
+        else
+            Filter(tag);
     }
 
     /// <summary>
@@ -108,6 +126,9 @@ public class Manager : MonoBehaviour
         for (int i = 0; i < tempArray.allContents.Length; i++)
         {
             topicList.Add(tempArray.allContents[i]);
+            // 读取tag
+            foreach (var tag in tempArray.allContents[i].tags)
+                tagSet.Add(tag);
         }
     }
 
