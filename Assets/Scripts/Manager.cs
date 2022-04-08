@@ -39,11 +39,55 @@ public class Manager : MonoBehaviour
 
     private void Start()
     {
+        // 显示全部
+        Filter();
+    }
+
+    /// <summary>
+    /// 进行过滤
+    /// </summary>
+    /// <param name="tags"></param>
+    public void Filter(params string[] tags)
+    {
+        // 清空原先内容
+        for (var i = 0; i < topicConentParent.transform.childCount; i++)
+            Destroy(topicConentParent.transform.GetChild(i).gameObject);
+
+        // 没有指定 全部显示
+        if (tags.Length == 0)
+            foreach (var item in topicList)
+                    AddTopicTo(item, topicConentParent);
         // 添加UI物体
-        foreach (var item in topicList)
+        else foreach(var item in topicList)
         {
-            AddTopicTo(item, topicConentParent);
+            if(ContainStr(item.tags, tags))
+                AddTopicTo(item, topicConentParent);
         }
+    }
+
+    /// <summary>
+    /// 检查是否全部符合
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private bool ContainStr(string[] value, string[] target)
+    {
+        bool finded = false;
+        for (int i = 0; i < target.Length; i++)
+        {
+            finded = false;
+            for (int j = 0; j < value.Length; j++)
+            {
+                if (value[j].Equals(target[i]))
+                {
+                    finded = true;
+                    break;
+                }
+            }
+            if(!finded) return false; 
+        }
+        return finded;
     }
 
     /// <summary>
