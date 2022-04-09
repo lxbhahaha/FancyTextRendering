@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/FancyTextRendering/Demo/DemoScene.unity
-    guid: 3ccb0cdc40d61b44db71ce34409a7d71
+    path: Assets/Scene/MainScene.unity
+    guid: 9734017689984ca4dbd003fde155cc0b
   m_configObjects: {}

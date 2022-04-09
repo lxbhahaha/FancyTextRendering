@@ -248,6 +248,7 @@ public class Manager : MonoBehaviour
         editPanel.inputTitle.text = currentTopic.name;
         editPanel.inputSummary.text = currentTopic.summary;
         editPanel.inputContent.text = markdownRenderer.Source;
+        editPanel.ClearTags();
         foreach (var tag in currentTopic.tags)
             editPanel.AddTag(tag);
 

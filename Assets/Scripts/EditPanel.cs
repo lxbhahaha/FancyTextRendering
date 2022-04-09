@@ -84,6 +84,16 @@ public class EditPanel : MonoBehaviour
     }
 
     /// <summary>
+    /// 清空原先的标签
+    /// </summary>
+    public void ClearTags()
+    {
+        // 清空原先内容
+        for (var i = 0; i < tagsParent.transform.childCount; i++)
+            Destroy(tagsParent.transform.GetChild(i).gameObject);
+    }
+
+    /// <summary>
     /// 保存该md文件
     /// </summary>
     public void Save()
