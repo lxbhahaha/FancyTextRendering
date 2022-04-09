@@ -18,7 +18,14 @@ public class Manager : MonoBehaviour
     // 标签dropdown
     public TMP_Dropdown tagDropdown;
 
+    public FancyTextRendering.Demo.DemoRenderUpdater demoRenderUpdater;
+
+    public TextMeshProUGUI textTitle;
+    public TextMeshProUGUI textSummary;
+
     #endregion
+
+    public EditPanel editPanel;
 
     // json的文件名称
     private string topicListStr = "TopicList.json";
@@ -29,7 +36,10 @@ public class Manager : MonoBehaviour
     // topic的列表
     private List<Topic> topicList = new List<Topic>();
     // 保存已有的标签
-    HashSet<string> tagSet = new HashSet<string>();
+    public HashSet<string> tagSet = new HashSet<string>();
+
+    // 当前选择的Topic
+    private Topic currentTopic = null;
 
     private void Awake()
     {
@@ -182,17 +192,30 @@ public class Manager : MonoBehaviour
             Directory.CreateDirectory(markdownRootPath);
 
         string path = markdownRootPath + topic.fileName + ".md";
-        //// 已存在就不保存
-        //if (File.Exists(path))
-        //{
-        //    Debug.LogError("??????????" + topic.fileName + ".md");
-        //    return;
-        //}
 
         // 保存文件
         File.WriteAllText(path, data);
+
+        // 添加topic
+        for (int i = 0; i < topicList.Count; i++)
+        {
+            if(topicList[i].name == topic.name)
+            {
+                topicList.RemoveAt(i);
+                break;
+            }
+        }
+        topicList.Add(topic);
+
+        // 保存一下json
+        SaveJson();
     }
 
+    /// <summary>
+    /// 添加topic到UI中
+    /// </summary>
+    /// <param name="topic"></param>
+    /// <param name="parent"></param>
     private void AddTopicTo(Topic topic, Transform parent)
     {
         // 创建物体
@@ -201,6 +224,72 @@ public class Manager : MonoBehaviour
         TopicUI tempTopicUI = tempObj.GetComponent<TopicUI>();
         tempTopicUI.SetData(topic);
         // 添加委托
-        tempTopicUI.ClickAction = () => markdownRenderer.Source = GetMarkdownString(topic.fileName); 
+        tempTopicUI.ClickAction = () => { 
+            markdownRenderer.Source = GetMarkdownString(topic.fileName); 
+            currentTopic = topic;
+            textTitle.text = topic.name;
+            textSummary.text = topic.summary;
+        }; 
+    }
+
+    /// <summary>
+    /// 编辑当前选择的md
+    /// </summary>
+    public void Edit()
+    {
+        // 检查现在是否有选择
+        if(currentTopic == null)
+        {
+            LogMessege.Instance.ShowMessege("当前没有选中的MarkDown文件");
+            return;
+        }
+        
+        // 把内容传过去
+        editPanel.inputTitle.text = currentTopic.name;
+        editPanel.inputSummary.text = currentTopic.summary;
+        editPanel.inputContent.text = markdownRenderer.Source;
+        foreach (var tag in currentTopic.tags)
+            editPanel.AddTag(tag);
+
+        // 更新md显示
+        demoRenderUpdater.UpdateRender();
+    }
+
+    /// <summary>
+    /// 删除当前选择的md
+    /// </summary>
+    public void Delete()
+    {
+        // 检查现在是否有选择
+        if (currentTopic == null)
+        {
+            LogMessege.Instance.ShowMessege("当前没有选中的MarkDown文件");
+            return;
+        }
+
+        LogMessege.Instance.ShowComfirmBox("是否真的删除" + currentTopic.name + "？删除无法找回。", DeleteAction);
+    }
+    private void DeleteAction()
+    {
+        // 没有文件则提示返回
+        if (!File.Exists(markdownRootPath + currentTopic.fileName + ".md"))
+        {
+            // TODO 暂无操作
+        }
+        else
+        {
+            // 删除文件
+            File.Delete(markdownRootPath + currentTopic.fileName + ".md");
+        }
+
+        // 删除Topic
+        topicList.Remove(currentTopic);
+        // 保存一下json
+        SaveJson();
+
+        // 调用一下筛选的函数
+        OnDropDownChange();
+
+        LogMessege.Instance.ShowMessege("删除成功");
     }
 }

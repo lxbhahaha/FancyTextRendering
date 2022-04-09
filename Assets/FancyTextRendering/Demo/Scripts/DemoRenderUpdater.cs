@@ -18,7 +18,7 @@ namespace FancyTextRendering.Demo
         }
 
         [Button]
-        private void UpdateRender()
+        public void UpdateRender()
         {
             MarkdownRenderer.Source = MarkdownSourceInputField.text;
         }
