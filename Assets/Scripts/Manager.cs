@@ -23,6 +23,8 @@ public class Manager : MonoBehaviour
     public TextMeshProUGUI textTitle;
     public TextMeshProUGUI textSummary;
 
+    public TMP_InputField searchTextInput;
+
     #endregion
 
     public EditPanel editPanel;
@@ -40,6 +42,8 @@ public class Manager : MonoBehaviour
 
     // 当前选择的Topic
     private Topic currentTopic = null;
+    // 当前正在显示的所有TopicUI
+    private List<TopicUI> showingTopicUIs = new List<TopicUI>();
 
     private void Awake()
     {
@@ -78,6 +82,7 @@ public class Manager : MonoBehaviour
     public void Filter(params string[] tags)
     {
         // 清空原先内容
+        showingTopicUIs.Clear();
         for (var i = 0; i < topicConentParent.transform.childCount; i++)
             Destroy(topicConentParent.transform.GetChild(i).gameObject);
 
@@ -91,6 +96,38 @@ public class Manager : MonoBehaviour
             if(ContainStr(item.tags, tags))
                 AddTopicTo(item, topicConentParent);
         }
+    }
+
+    /// <summary>
+    /// 在当前显示的所有Topic中搜索
+    /// </summary>
+    /// <param name="target">搜索的内容</param>
+    public void Search(string target)
+    {
+        List<TopicUI> deleteList = new List<TopicUI>();
+        for (int i = 0; i < showingTopicUIs.Count; i++)
+        {
+            // 如果名字和简介都找不到这个搜索内容则进行记录
+            if (!showingTopicUIs[i].topic.name.Contains(target) &&
+                !showingTopicUIs[i].topic.summary.Contains(target))
+            {
+                deleteList.Add(showingTopicUIs[i]);
+            }
+        }
+        // 对标记的内容进行删除
+        for (int i = 0; i < deleteList.Count; i++)
+        {
+            Destroy(deleteList[i].gameObject);
+            showingTopicUIs.Remove(deleteList[i]);
+        }
+    }
+
+    /// <summary>
+    /// 搜索输入框中的内容
+    /// </summary>
+    public void Search()
+    {
+        Search(searchTextInput.text);
     }
 
     /// <summary>
@@ -229,7 +266,9 @@ public class Manager : MonoBehaviour
             currentTopic = topic;
             textTitle.text = topic.name;
             textSummary.text = topic.summary;
-        }; 
+        };
+        // 记录当前TopicUI为正在显示
+        showingTopicUIs.Add(tempTopicUI);
     }
 
     /// <summary>

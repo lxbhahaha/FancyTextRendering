@@ -5,6 +5,7 @@ using UnityEngine;
 using System;
 using TMPro;
 
+[Serializable]
 public class TopicUI : MonoBehaviour, IPointerDownHandler
 {
     public GameObject tagPrefab;
@@ -30,6 +31,7 @@ public class TopicUI : MonoBehaviour, IPointerDownHandler
     /// <param name="topic"></param>
     public void SetData(Topic topic)
     {
+        this.topic = topic;
         // …Ë÷√Œƒ◊÷
         textName.text = topic.name;
         textSummary.text = topic.summary;
