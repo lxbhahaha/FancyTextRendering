@@ -66,6 +66,14 @@ public class Manager : MonoBehaviour
         Filter();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            LogMessege.Instance.ShowComfirmBox("是否立即关闭此应用程序？",()=>Application.Quit());
+        }
+    }
+
     public void OnDropDownChange()
     {
         string tag = tagDropdown.captionText.text;
